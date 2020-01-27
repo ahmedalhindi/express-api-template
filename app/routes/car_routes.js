@@ -30,7 +30,6 @@ router.post('/cars', (req,res,next)=>{
 // GET /cars/:id
 router.get('/cars/:id',(req,res,next)=>{
     carId = req.params.id
-    console.log(carId)
     Car.findById(carId)
     .then(car=>{
         res.status(200).json({car:car})
@@ -44,6 +43,17 @@ router.patch('/cars/:id',(req,res,next)=>{
     const carId = req.params.id
     const updatedCar = req.body.car
     Car.findByIdAndUpdate(carId, updatedCar)
+    .then(()=>{
+        res.sendStatus(204)
+    })
+    .catch(next)
+})
+
+// DESTROY
+// DELETE  /cars/:id
+router.delete('/cars/:id',(req, res, next)=>{
+    const carId = req.params.id
+    Car.findByIdAndRemove(carId)
     .then(()=>{
         res.sendStatus(204)
     })
