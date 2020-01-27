@@ -1,9 +1,7 @@
-// import mongoose schema
-const Schema = require('mongoose').Schema
-const Model = require('mongoose').Model
+const mongoose = require('mongoose')
 
 // schema
-const carSchema = new Schema({
+const carSchema = new mongoose.Schema({
     name:{
         type: String,
         required: true
@@ -13,7 +11,7 @@ const carSchema = new Schema({
         required: true
     },
     color: String,
-    passanger: {
+    passenger: {
         type: String,
         required: true
     }
@@ -22,6 +20,6 @@ const carSchema = new Schema({
 })
 
 // define models
-const carModel = new Model("Car", carSchema)
+const Car = mongoose.model("Car", carSchema)
 
-module.exports={carModel}
+module.exports=Car
