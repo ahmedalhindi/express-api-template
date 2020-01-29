@@ -5,6 +5,10 @@ const router = express.Router()
 // import car model
 const Car = require('../models/car')
 
+// import custom errors
+const customErrors = require('../../lib/custom_errors')
+const requireOwnership = customErrors.requireOwnership
+
 
 // import passport
 const passport = require('passport')
@@ -38,35 +42,42 @@ router.post('/cars', requireToken, (req,res,next)=>{
 
 // SHOW
 // GET /cars/:id
-router.get('/cars/:id',(req,res,next)=>{
+router.get('/cars/:id',requireToken,(req,res,next)=>{
     carId = req.params.id
     Car.findById(carId)
     .then(car=>{
+        requireOwnership(req, car)
         res.status(200).json({car:car})
     })
     .catch(next)
 })
 
 // UPDATE
+// PUT -> Large data
+// PATCH -> small data
 // PATCH /cars/:id
-router.patch('/cars/:id',(req,res,next)=>{
+router.patch('/cars/:id',requireToken, (req,res,next)=>{
     const carId = req.params.id
     const updatedCar = req.body.car
-    Car.findByIdAndUpdate(carId, updatedCar)
-    .then(()=>{
-        res.sendStatus(204)
+    Car.findById(carId)
+    .then((car)=>{
+        requireOwnership(req,car)
+        return car.update(updatedCar)
     })
+    .then(()=> res.sendStatus(204))
     .catch(next)
 })
 
 // DESTROY
 // DELETE  /cars/:id
-router.delete('/cars/:id',(req, res, next)=>{
+router.delete('/cars/:id',requireToken,(req, res, next)=>{
     const carId = req.params.id
-    Car.findByIdAndRemove(carId)
-    .then(()=>{
-        res.sendStatus(204)
+    Car.findById(carId)
+    .then((car)=>{
+        requireOwnership(req,car)
+        return car.remove()
     })
+    .then(()=>res.sendStatus(204))
     .catch(next)
 })
 module.exports = router
